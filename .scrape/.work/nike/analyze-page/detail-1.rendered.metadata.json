@@ -1,0 +1,80 @@
+{
+  "json-ld": [
+    {
+      "@context": "https://schema.org",
+      "@type": "ProductGroup",
+      "@id": "https://www.nike.com/id/t/academy-erling-haaland-football-ERATCGJV#group",
+      "name": "Nike Academy 'Erling Haaland' Football",
+      "description": "Score goal after goal with this Erling Haaland Academy Football. Crafted with our innovative OmniSculpt technology, it features grooves debossed into the casing to deliver truer flight.",
+      "url": "https://www.nike.com/id/t/academy-erling-haaland-football-ERATCGJV",
+      "productGroupID": "ERATCGJV",
+      "variesBy": [
+        "https://schema.org/color"
+      ],
+      "brand": {
+        "@type": "Brand",
+        "name": "Nike"
+      },
+      "audience": {
+        "@type": "PeopleAudience",
+        "suggestedGender": "https://schema.org/Unisex",
+        "suggestedMinAge": 13
+      },
+      "hasVariant": [
+        {
+          "@type": "Product",
+          "@id": "https://www.nike.com/id/t/academy-erling-haaland-football-ERATCGJV/IR4337-398#color",
+          "name": "Nike Academy 'Erling Haaland' Football - Green Strike/Flash Crimson/Black",
+          "color": "Green Strike/Flash Crimson/Black",
+          "description": "Score goal after goal with this Erling Haaland Academy Football. Crafted with our innovative OmniSculpt technology, it features grooves debossed into the casing to deliver truer flight.",
+          "mpn": "IR4337-398",
+          "image": "https://static.nike.com/a/images/t_default/u_9ddf04c7-2a9a-4d76-add1-d15af8f0263d,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/8a8b5033-9838-413f-86a1-9250aa25cabf/NK+EH+ACADEMY+-+SU26.png",
+          "offers": {
+            "@type": "Offer",
+            "url": "https://www.nike.com/id/t/academy-erling-haaland-football-ERATCGJV/IR4337-398",
+            "price": 439000,
+            "priceCurrency": "IDR",
+            "itemCondition": "https://schema.org/NewCondition"
+          }
+        }
+      ]
+    }
+  ],
+  "opengraph": [
+    {
+      "namespace": {
+        "og": "http://ogp.me/ns#"
+      },
+      "properties": [
+        [
+          "og:title",
+          "Nike Academy 'Erling Haaland' Football"
+        ],
+        [
+          "og:description",
+          "Find the Nike Academy 'Erling Haaland' Football at Nike.com.  Shop online at Nike.com."
+        ],
+        [
+          "og:type",
+          "website"
+        ],
+        [
+          "og:url",
+          "https://www.nike.com/id/t/academy-erling-haaland-football-ERATCGJV/IR4337-398"
+        ],
+        [
+          "og:image",
+          "https://static.nike.com/a/images/t_default/u_9ddf04c7-2a9a-4d76-add1-d15af8f0263d,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/a714ef93-5bcb-449c-a7aa-d02869628950/NK+EH+ACADEMY+-+SU26.png"
+        ],
+        [
+          "og:locale",
+          "en_GB"
+        ],
+        [
+          "og:site_name",
+          "Nike.com"
+        ]
+      ]
+    }
+  ]
+}

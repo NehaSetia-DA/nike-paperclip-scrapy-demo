@@ -1,0 +1,31 @@
+{
+  "url": "https://www.nike.com/id/t/academy-erling-haaland-football-ERATCGJV",
+  "page_id": "detail-1",
+  "html_variant": "rendered",
+  "fields": {
+    "name": {"type": "str", "value": "Nike Academy 'Erling Haaland' Football"},
+    "subtitle": {"type": "str", "value": "Football"},
+    "brand": {"type": "str", "value": "Nike"},
+    "description": {"type": "str", "value": "Score goal after goal with this Erling Haaland Academy Football. Crafted with our innovative OmniSculpt technology, it features grooves debossed into the casing to deliver truer flight."},
+    "price": {"type": "float", "value": 439000},
+    "price_currency": {"type": "str", "value": "IDR"},
+    "price_formatted": {"type": "str", "value": "Rp 439.000"},
+    "color": {"type": "str", "value": "Green Strike/Flash Crimson/Black"},
+    "colour_shown": {"type": "str", "value": "Green Strike/Flash Crimson/Black"},
+    "style_color": {"type": "str", "value": "IR4337-398"},
+    "mpn": {"type": "str", "value": "IR4337-398"},
+    "product_group_id": {"type": "str", "value": "ERATCGJV"},
+    "country_of_origin": {"type": "str", "value": "China"},
+    "materials": {"type": "str", "value": "67% rubber/10% polyurethane (PU)/13% polyester/10% ethylene vinyl acetate (EVA)"},
+    "import_status": {"type": "str", "value": "Imported"},
+    "suggested_gender": {"type": "str", "value": "Unisex"},
+    "suggested_min_age": {"type": "int", "value": 13},
+    "item_condition": {"type": "str", "value": "NewCondition"},
+    "reviews": {"type": "str", "value": "No reviews / Reviews (error)"},
+    "image": {"type": "str", "value": "https://static.nike.com/a/images/t_default/u_9ddf04c7-2a9a-4d76-add1-d15af8f0263d,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/8a8b5033-9838-413f-86a1-9250aa25cabf/NK+EH+ACADEMY+-+SU26.png"},
+    "og_image": {"type": "str", "value": "https://static.nike.com/a/images/t_default/u_9ddf04c7-2a9a-4d76-add1-d15af8f0263d,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/a714ef93-5bcb-449c-a7aa-d02869628950/NK+EH+ACADEMY+-+SU26.png"},
+    "product_type": {"type": "str", "value": "ProductGroup"},
+    "offer_url": {"type": "str", "value": "https://www.nike.com/id/t/academy-erling-haaland-football-ERATCGJV/IR4337-398"},
+    "variant_count": {"type": "int", "value": 1}
+  }
+}

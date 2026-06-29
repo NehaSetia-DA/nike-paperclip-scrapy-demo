@@ -1,0 +1,67 @@
+{
+  "company": {
+    "name": "Nike Product Intelligence",
+    "description": "Local demo company that coordinates agentic Scrapy + Zyte API product extraction for public Nike pages.",
+    "budgetMonthlyCents": 2500
+  },
+  "agents": [
+    {
+      "name": "Coordinator",
+      "role": "ceo",
+      "title": "Coordinator",
+      "capabilities": "Breaks extraction goals into issues, requests approval, and keeps work aligned with compliance and reliability.",
+      "adapterType": "claude_local"
+    },
+    {
+      "name": "ScrapyBuilder",
+      "role": "engineer",
+      "title": "Scrapy Builder",
+      "reportsTo": "Coordinator",
+      "capabilities": "Runs Zyte Claude skills to define schema, generate Scrapy project, create web-poet page objects, and wire spiders.",
+      "adapterType": "claude_local"
+    },
+    {
+      "name": "QAReviewer",
+      "role": "qa",
+      "title": "QA Reviewer",
+      "reportsTo": "Coordinator",
+      "capabilities": "Runs fixtures and sample crawls, checks required fields, duplicates, and Zyte API usage.",
+      "adapterType": "claude_local"
+    },
+    {
+      "name": "Monitor",
+      "role": "general",
+      "title": "Catalog Health Monitor",
+      "reportsTo": "Coordinator",
+      "capabilities": "Runs scheduled health checks and opens repair issues when crawl quality drops.",
+      "adapterType": "claude_local"
+    }
+  ],
+  "issues": [
+    {
+      "title": "Approve Nike product extraction schema",
+      "description": "Use docs/product-schema.md as the intended schema. The builder must generate a review page and request approval before code generation.",
+      "priority": "high",
+      "assignee": "Coordinator"
+    },
+    {
+      "title": "Generate Scrapy + Zyte API project through Zyte Claude skills",
+      "description": "Run prompts/zyte-skill-pipeline.md from the demo workspace. Do not handwrite selectors. Stop if credentials or compliance gates fail.",
+      "priority": "high",
+      "assignee": "ScrapyBuilder"
+    },
+    {
+      "title": "Validate generated fixtures and sample crawl",
+      "description": "Run fixtures, crawl 10 product records, and verify required fields, duplicates, and Zyte API evidence.",
+      "priority": "medium",
+      "assignee": "QAReviewer"
+    }
+  ],
+  "routine": {
+    "title": "Daily Nike Catalog Health Check",
+    "description": "Run a small crawl, summarize item count, required-field completeness, duplicate URLs, Zyte API evidence, and open a repair issue if quality drops.",
+    "assignee": "Monitor",
+    "cronExpression": "0 9 * * *",
+    "timezone": "Asia/Makassar"
+  }
+}

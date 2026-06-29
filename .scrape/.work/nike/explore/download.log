@@ -1,0 +1,79 @@
+2026-06-29 14:22:14,757 [__main__] INFO: Using Zyte API.
+2026-06-29 14:22:14,758 [scrapy.utils.log] INFO: Scrapy 2.16.0 started (bot: scrapybot)
+2026-06-29 14:22:14,790 [scrapy.utils.log] INFO: Versions:
+{'lxml': '6.1.1',
+ 'libxml2': '2.14.6',
+ 'cssselect': '1.4.0',
+ 'parsel': '1.11.0',
+ 'w3lib': '2.4.1',
+ 'Twisted': '26.4.0',
+ 'Python': '3.11.15 (main, Jun  2 2026, 22:36:57) [Clang 22.1.3 ]',
+ 'pyOpenSSL': '26.3.0 (OpenSSL 4.0.1 9 Jun 2026)',
+ 'cryptography': '49.0.0',
+ 'Platform': 'macOS-26.5.1-arm64-arm-64bit'}
+2026-06-29 14:22:14,791 [scrapy.crawler] DEBUG: Using CrawlerProcess
+2026-06-29 14:22:14,793 [scrapy.addons] INFO: Enabled addons:
+[<scrapy_zyte_api.addon.Addon object at 0x10c9ecc90>]
+2026-06-29 14:22:14,797 [asyncio] DEBUG: Using selector: KqueueSelector
+2026-06-29 14:22:14,798 [scrapy.utils.log] DEBUG: Using reactor: twisted.internet.asyncioreactor.AsyncioSelectorReactor
+2026-06-29 14:22:14,798 [scrapy.utils.log] DEBUG: Using asyncio event loop: asyncio.unix_events._UnixSelectorEventLoop
+2026-06-29 14:22:14,818 [scrapy.extensions.telnet] INFO: Telnet Password: 18310fd967e70c34
+2026-06-29 14:22:14,839 [scrapy.middleware] INFO: Enabled extensions:
+['scrapy.extensions.corestats.CoreStats',
+ 'scrapy.extensions.logcount.LogCount',
+ 'scrapy.extensions.telnet.TelnetConsole',
+ 'scrapy.extensions.memusage.MemoryUsage',
+ 'scrapy.extensions.logstats.LogStats']
+2026-06-29 14:22:14,840 [scrapy.crawler] INFO: Overridden settings:
+{'CONCURRENT_REQUESTS': 8,
+ 'CONCURRENT_REQUESTS_PER_DOMAIN': 4,
+ 'DOWNLOAD_TIMEOUT': 30,
+ 'LOG_ENABLED': False,
+ 'LOG_LEVEL': 'INFO',
+ 'REQUEST_FINGERPRINTER_CLASS': 'scrapy_zyte_api.ScrapyZyteAPIRequestFingerprinter',
+ 'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
+               'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 '
+               'Safari/537.36'}
+2026-06-29 14:22:14,855 [scrapy_zyte_api.handler] INFO: Using a Zyte API key starting with '66dce04'
+2026-06-29 14:22:16,630 [scrapy_zyte_api.handler] INFO: Using a Zyte API key starting with '66dce04'
+2026-06-29 14:22:16,740 [scrapy.middleware] INFO: Enabled downloader middlewares:
+['scrapy.downloadermiddlewares.offsite.OffsiteMiddleware',
+ 'scrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware',
+ 'scrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware',
+ 'scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware',
+ 'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware',
+ 'scrapy.downloadermiddlewares.retry.RetryMiddleware',
+ <class 'scrapy_zyte_api._session.ScrapyZyteAPISessionResetterDownloaderMiddleware'>,
+ 'scrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware',
+ 'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware',
+ 'scrapy.downloadermiddlewares.redirect.RedirectMiddleware',
+ <class 'scrapy_zyte_api._middlewares.ScrapyZyteAPIDownloaderMiddleware'>,
+ <class 'scrapy_zyte_api._session.ScrapyZyteAPISessionDownloaderMiddleware'>,
+ 'scrapy.downloadermiddlewares.cookies.CookiesMiddleware',
+ 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware',
+ 'scrapy.downloadermiddlewares.stats.DownloaderStats']
+2026-06-29 14:22:16,759 [scrapy.middleware] INFO: Enabled spider middlewares:
+['scrapy.spidermiddlewares.start.StartSpiderMiddleware',
+ 'scrapy.spidermiddlewares.httperror.HttpErrorMiddleware',
+ <class 'scrapy_zyte_api._middlewares.ScrapyZyteAPISpiderMiddleware'>,
+ 'scrapy.spidermiddlewares.referer.RefererMiddleware',
+ 'scrapy.spidermiddlewares.urllength.UrlLengthMiddleware',
+ 'scrapy.spidermiddlewares.depth.DepthMiddleware',
+ <class 'scrapy_zyte_api._middlewares.ScrapyZyteAPIRefererSpiderMiddleware'>]
+2026-06-29 14:22:16,760 [scrapy.middleware] INFO: Enabled item pipelines:
+[]
+2026-06-29 14:22:16,760 [scrapy.core.engine] INFO: Spider opened
+2026-06-29 14:22:16,780 [scrapy.extensions.logstats] INFO: Crawled 0 pages (at 0 pages/min), scraped 0 items (at 0 items/min)
+2026-06-29 14:22:16,781 [scrapy.extensions.telnet] INFO: Telnet console listening on 127.0.0.1:6023
+2026-06-29 14:22:16,782 [scrapy.core.engine] INFO: Closing spider (finished)
+2026-06-29 14:22:16,782 [scrapy.statscollectors] INFO: Dumping Scrapy stats:
+{'elapsed_time_seconds': 0.002029041002970189,
+ 'finish_reason': 'finished',
+ 'finish_time': datetime.datetime(2026, 6, 29, 6, 22, 16, 782551, tzinfo=datetime.timezone.utc),
+ 'items_per_minute': None,
+ 'log_count/INFO': 3,
+ 'memusage/max': 81805312,
+ 'memusage/startup': 81805312,
+ 'responses_per_minute': None,
+ 'start_time': datetime.datetime(2026, 6, 29, 6, 22, 16, 780508, tzinfo=datetime.timezone.utc)}
+2026-06-29 14:22:16,783 [scrapy.core.engine] INFO: Spider closed (finished)
