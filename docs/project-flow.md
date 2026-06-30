@@ -10,62 +10,61 @@ Editable dark-mode Excalidraw version:
 
 ```mermaid
 flowchart TD
-    A["User goal: agentic ecommerce scraping demo"] --> B["Choose target site"]
-    B --> C{"Foot Locker ID viable?"}
-    C -->|"Difficult / blocked"| D["Switch to Nike public pages"]
-    C -->|"Allowed and stable"| E["Continue Foot Locker plan"]
-    D --> F["Preflight: tools, credentials, robots, terms boundary"]
-    F --> G{"Allowed public target?"}
-    G -->|"No"| H["Stop or choose compliant target"]
-    G -->|"Yes"| I["Create Paperclip company: Nike Product Intelligence"]
+    A["Paperclip company: Nike Product Intelligence"] --> B["Goal: generate and monitor Nike product catalog extraction"]
+    B --> C["Workspace: nike-paperclip-scrapy-demo / nike_catalog"]
+    C --> D["Local environment: ANTHROPIC_API_KEY + ZYTE_API_KEY"]
+    D --> E["Coordinator"]
 
-    I --> J["Coordinator creates build issues and schema approval"]
-    J --> K["ScrapyBuilder runs Zyte Claude skill flow"]
-    K --> K1["/scrape-zyte-login"]
-    K1 --> K2["/scrape-define"]
-    K2 --> K3["/scrape-review-schema"]
-    K3 --> L{"Schema approved?"}
-    L -->|"No"| K2
-    L -->|"Yes"| K4["/scrape-spec"]
-    K4 --> K5["/scrape-ensure-project"]
-    K5 --> K6["/scrape-codegen"]
-    K6 --> K7["/scrape-create-spider"]
+    E --> F["ScrapyBuilder"]
+    E --> G["QAReviewer"]
+    E --> H["Monitor"]
+    E --> I["CostAnalyst"]
 
-    K7 --> M["Generated Scrapy project: nike_catalog"]
-    M --> N["Extraction strategy: Nike JSON-LD ProductGroup/Product"]
-    N --> O["Zyte API access: scrapy-zyte-api with browserHtml for reliability"]
-    O --> P["Fixtures and sample output"]
-    P --> Q["QAReviewer validates schema completeness and duplicates"]
-    Q --> R{"Sample crawl healthy?"}
-    R -->|"No"| S["QA repair issue"]
-    S --> T{"Structural site/parser drift?"}
-    T -->|"Yes"| U["Coordinator sends rebuild to ScrapyBuilder"]
-    T -->|"No"| V["Local parser/settings repair by QA"]
-    R -->|"Yes"| W["Run mode begins"]
+    F --> J["Build mode: use Zyte Claude skill flow"]
+    J --> J1["/scrape-zyte-login"]
+    J1 --> J2["/scrape-define"]
+    J2 --> J3["/scrape-review-schema"]
+    J3 --> K{"Schema approved?"}
+    K -->|"No"| J2
+    K -->|"Yes"| J4["/scrape-spec"]
+    J4 --> J5["/scrape-ensure-project"]
+    J5 --> J6["/scrape-codegen"]
+    J6 --> J7["/scrape-create-spider"]
+    J7 --> L["Generated Scrapy project: nike_catalog"]
 
-    W --> X["Monitor runs scripts/monitor-nike-crawl.sh"]
-    X --> Y["Scrapy spider writes products.jsonl and crawl.log"]
-    Y --> Z["Spidermon close monitors run"]
-    Z --> Z1["Minimum item count"]
-    Z --> Z2["Required field completeness"]
-    Z --> Z3["Duplicate product URLs"]
-    Z --> Z4["Zyte API processed requests"]
-    Z --> Z5["Fatal Zyte API errors"]
-    Z --> AA["Paperclip health JSON report"]
-    AA --> AB{"Quality passed?"}
-    AB -->|"Yes"| AC["Monitor records healthy run"]
-    AB -->|"No"| AD["Monitor opens QA repair issue"]
-    AD --> T
+    L --> M["Extraction strategy: Nike JSON-LD ProductGroup/Product"]
+    M --> N["Zyte API access through scrapy-zyte-api"]
+    N --> O["Fixtures and sample crawl"]
+    O --> G
 
-    W --> AE["CostAnalyst run: /scrapy-cost-analysis or local analyzer"]
-    AE --> AF{"Cost issue confirmed?"}
-    AF -->|"No"| AG["Keep current reliability-first settings"]
-    AF -->|"Yes"| AH["Recommend highest-impact reduction"]
-    AH --> AI{"Browser rendering needed?"}
-    AI -->|"No"| AJ["Test cheaper non-browser PDP requests"]
-    AI -->|"Yes"| AK["Keep rendering but reduce duplicates/retries/scope"]
-    AJ --> Q
-    AK --> Q
+    G --> P{"Healthy sample?"}
+    P -->|"No"| Q["QA repair issue"]
+    Q --> R{"Structural site/parser drift?"}
+    R -->|"Yes"| E
+    R -->|"No"| S["Local parser/settings repair"]
+    S --> G
+    P -->|"Yes"| T["Run mode begins"]
+
+    H --> U["scripts/monitor-nike-crawl.sh"]
+    T --> U
+    U --> V["Scrapy writes products.jsonl + crawl.log"]
+    V --> W["Spidermon close monitors"]
+    W --> W1["minimum items"]
+    W --> W2["required fields"]
+    W --> W3["duplicate product URLs"]
+    W --> W4["Zyte API processed requests"]
+    W --> W5["no fatal Zyte errors"]
+    W --> X["health.json"]
+    X --> Y{"Healthy run?"}
+    Y -->|"Yes"| Z["Monitor records healthy latest run"]
+    Y -->|"No"| Q
+
+    I --> AA["/scrapy-cost-analysis or local analyzer"]
+    AA --> AB["Review browserHtml, automap, retries, duplicates, request/item ratio"]
+    AB --> AC{"Highest-impact cost change?"}
+    AC -->|"None"| AD["Keep reliability-first settings"]
+    AC -->|"Yes"| AE["Test cheaper non-browser JSON-LD path or reduce duplicates/retries"]
+    AE --> G
 ```
 
 ## Why Paperclip
@@ -75,7 +74,7 @@ company, goal, agents, issues, approvals, routines, and repair ownership. The
 important design decision is that Paperclip does not scrape by itself. It routes
 work to the right specialist:
 
-- `Coordinator` decides build mode vs run mode.
+- `Coordinator` decides build mode vs run mode, owns approval gates, and routes rebuilds only when QA confirms structural drift.
 - `ScrapyBuilder` only runs for a new site, schema change, or structural drift.
 - `Monitor` runs the existing spider and creates repair work when quality drops.
 - `QAReviewer` diagnoses failures before escalating to a rebuild.
