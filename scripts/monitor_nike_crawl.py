@@ -8,6 +8,7 @@ from pathlib import Path
 
 
 REQUIRED = ["name", "brand", "product_url", "price", "currency", "source_url", "fetched_at"]
+ZYTE_API_PATTERN = r"scrapy[-_]zyte[-_]api"
 
 
 def load_items(path: Path) -> list[dict]:
@@ -44,8 +45,13 @@ def build_report(items_path: Path, log_path: Path, min_items: int) -> dict:
         "required_fields_complete": all(count == 0 for count in missing.values()),
         "no_duplicate_product_urls": duplicate_urls == 0,
         "spidermon_evidence": "[Spidermon]" in log_text,
-        "zyte_api_evidence": "scrapy-zyte-api" in log_text,
-        "no_fatal_zyte_errors": "'scrapy-zyte-api/fatal_errors': 0" in log_text or '"scrapy-zyte-api/fatal_errors": 0' in log_text,
+        "zyte_api_evidence": bool(re.search(ZYTE_API_PATTERN, log_text, re.IGNORECASE)),
+        "no_fatal_zyte_errors": (
+            "'scrapy-zyte-api/fatal_errors': 0" in log_text
+            or '"scrapy-zyte-api/fatal_errors": 0' in log_text
+            or "'scrapy_zyte_api/fatal_errors': 0" in log_text
+            or '"scrapy_zyte_api/fatal_errors": 0' in log_text
+        ),
     }
 
     failures = [name for name, passed in checks.items() if not passed]
@@ -85,7 +91,7 @@ def build_report(items_path: Path, log_path: Path, min_items: int) -> dict:
         },
         "zyte_api": {
             "evidence_in_log": checks["zyte_api_evidence"],
-            "processed_mentions": count_log(r"scrapy-zyte-api/processed", log_text),
+            "processed_mentions": count_log(r"scrapy[-_]zyte[-_]api/processed", log_text),
             "fatal_error_zero_seen": checks["no_fatal_zyte_errors"],
         },
         "http_status_counts_from_log": {f"{code}:{count}": hits for (code, count), hits in status_counts.items()},

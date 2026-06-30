@@ -3,6 +3,14 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT="$ROOT/nike_catalog"
+
+if [ -f "$ROOT/.env" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  source "$ROOT/.env"
+  set +a
+fi
+
 RUN_ID="${RUN_ID:-$(date -u +"%Y%m%dT%H%M%SZ")}"
 ITEM_LIMIT="${ITEM_LIMIT:-10}"
 NIKE_DEMO_BREAK_FIELD="${NIKE_DEMO_BREAK_FIELD:-}"

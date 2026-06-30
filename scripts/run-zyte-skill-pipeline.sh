@@ -3,6 +3,13 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+if [ -f "$ROOT/.env" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  source "$ROOT/.env"
+  set +a
+fi
+
 if [ -z "${ZYTE_API_KEY:-}" ]; then
   echo "ZYTE_API_KEY is required. Run /scrape-zyte-login in Claude or export the key before continuing."
   exit 1
