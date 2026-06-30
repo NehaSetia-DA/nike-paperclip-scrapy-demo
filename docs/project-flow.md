@@ -8,6 +8,15 @@ cost analysis as the optimization lane.
 Editable dark-mode Excalidraw version:
 `docs/project-flow-dark.excalidraw`
 
+The Excalidraw file is split into separate frames:
+
+- Company overview
+- Coordinator routing
+- ScrapyBuilder build mode
+- Monitor run mode
+- QAReviewer repair loop
+- CostAnalyst optimization loop
+
 ```mermaid
 %%{init: {
   "theme": "base",
