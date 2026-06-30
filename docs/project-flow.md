@@ -5,6 +5,9 @@ as control plane, Zyte Claude skills as the build workflow, Scrapy as extraction
 engine, Zyte API as access/rendering layer, Spidermon as runtime guardrail, and
 cost analysis as the optimization lane.
 
+Editable dark-mode Excalidraw version:
+`docs/project-flow-dark.excalidraw`
+
 ```mermaid
 flowchart TD
     A["User goal: agentic ecommerce scraping demo"] --> B["Choose target site"]
