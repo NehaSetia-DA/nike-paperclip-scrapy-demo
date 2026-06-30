@@ -9,7 +9,7 @@
       "name": "Coordinator",
       "role": "ceo",
       "title": "Coordinator",
-      "capabilities": "Breaks extraction goals into issues, requests approval, and keeps work aligned with compliance and reliability.",
+      "capabilities": "Routes work between build mode and run mode, requests approval for schema/build changes, and escalates only structural scraper drift to ScrapyBuilder.",
       "adapterType": "claude_local"
     },
     {
@@ -17,7 +17,7 @@
       "role": "engineer",
       "title": "Scrapy Builder",
       "reportsTo": "Coordinator",
-      "capabilities": "Runs Zyte Claude skills to define schema, generate Scrapy project, create web-poet page objects, and wire spiders.",
+      "capabilities": "Runs Zyte Claude skills only for new websites, schema changes, or structural drift repairs. Does not run for routine crawls.",
       "adapterType": "claude_local"
     },
     {
@@ -25,7 +25,7 @@
       "role": "qa",
       "title": "QA Reviewer",
       "reportsTo": "Coordinator",
-      "capabilities": "Runs fixtures and sample crawls, checks required fields, duplicates, and Zyte API usage.",
+      "capabilities": "Reviews crawl outputs and health reports, diagnoses field completeness, duplicate URLs, parser drift, and decides whether repair can be local or needs ScrapyBuilder.",
       "adapterType": "claude_local"
     },
     {
@@ -33,7 +33,7 @@
       "role": "general",
       "title": "Catalog Health Monitor",
       "reportsTo": "Coordinator",
-      "capabilities": "Runs scheduled health checks and opens repair issues when crawl quality drops.",
+      "capabilities": "Runs existing spiders through scripts/monitor-nike-crawl.sh, records health reports, and opens QA repair issues when quality drops.",
       "adapterType": "claude_local"
     }
   ],
@@ -46,20 +46,20 @@
     },
     {
       "title": "Generate Scrapy + Zyte API project through Zyte Claude skills",
-      "description": "Run prompts/zyte-skill-pipeline.md from the demo workspace. Do not handwrite selectors. Stop if credentials or compliance gates fail.",
+      "description": "Build mode only. Run prompts/zyte-skill-pipeline.md from the demo workspace for a new site or schema change. Do not run this for routine Nike crawls.",
       "priority": "high",
       "assignee": "ScrapyBuilder"
     },
     {
       "title": "Validate generated fixtures and sample crawl",
-      "description": "Run fixtures, crawl 10 product records, and verify required fields, duplicates, and Zyte API evidence.",
+      "description": "QA mode. Run ./scripts/validate-scrapy-output.sh, inspect outputs/nike/latest/products.jsonl and reports/nike/latest-health.json, then decide pass, QA repair, or ScrapyBuilder rebuild.",
       "priority": "medium",
       "assignee": "QAReviewer"
     }
   ],
   "routine": {
     "title": "Daily Nike Catalog Health Check",
-    "description": "Run a small crawl, summarize item count, required-field completeness, duplicate URLs, Zyte API evidence, and open a repair issue if quality drops.",
+    "description": "Run ./scripts/monitor-nike-crawl.sh against the existing Nike spider. Do not call ScrapyBuilder unless the health report points to structural parser/site drift.",
     "assignee": "Monitor",
     "cronExpression": "0 9 * * *",
     "timezone": "Asia/Makassar"

@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT="$ROOT/nike_catalog"
-OUTPUT="$ROOT/outputs/nike-products-sample.jsonl"
+LATEST="$ROOT/outputs/nike/latest"
 
 if [ ! -d "$PROJECT" ]; then
   echo "Generated Scrapy project missing: $PROJECT"
@@ -14,10 +14,7 @@ fi
 cd "$PROJECT"
 uv run pytest fixtures/
 
-mkdir -p "$ROOT/outputs"
-rm -f "$OUTPUT"
-ZYTE_API_LOG_REQUESTS=True uv run scrapy crawl nike \
-  -s CLOSESPIDER_ITEMCOUNT=10 \
-  -O "$OUTPUT"
+cd "$ROOT"
+"$ROOT/scripts/monitor-nike-crawl.sh"
 
-python3 "$ROOT/scripts/check_sample_output.py" "$OUTPUT"
+python3 "$ROOT/scripts/check_sample_output.py" "$LATEST/products.jsonl"

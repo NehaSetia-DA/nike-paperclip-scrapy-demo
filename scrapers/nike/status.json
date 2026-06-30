@@ -1,0 +1,20 @@
+{
+  "site": "nike",
+  "display_name": "Nike Indonesia",
+  "mode": "run",
+  "scraper_state": "production_ready",
+  "spider": "nike",
+  "scrapy_project": "nike_catalog",
+  "schema": "../../docs/product-schema.md",
+  "last_build_issue": "NIK-2",
+  "last_qa_issue": "NIK-3",
+  "run_policy": {
+    "default_item_count": 10,
+    "builder_runs_only_when": [
+      "new site",
+      "schema changed",
+      "monitor or QA classifies failure as structural drift",
+      "coordinator explicitly requests rebuild"
+    ]
+  }
+}

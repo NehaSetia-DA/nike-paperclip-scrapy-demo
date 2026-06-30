@@ -27,7 +27,7 @@ For the already generated local scraper, this is the useful validation loop:
 
 ```sh
 export ZYTE_API_KEY="..."
-./scripts/validate-scrapy-output.sh
+./scripts/monitor-nike-crawl.sh
 ```
 
 ## Demo Architecture
@@ -43,6 +43,37 @@ export ZYTE_API_KEY="..."
 .scrape/nike/
 nike_catalog/
 outputs/nike-products-sample.jsonl
+```
+
+## Build Mode vs Run Mode
+
+Build mode is for first-time sites or structural changes:
+
+```sh
+./scripts/run-zyte-skill-pipeline.sh
+./scripts/validate-scrapy-output.sh
+```
+
+Run mode is for every normal Nike crawl after the spider exists:
+
+```sh
+export ZYTE_API_KEY="..."
+./scripts/monitor-nike-crawl.sh
+```
+
+Run mode does not call the Zyte codegen skills and does not involve
+`ScrapyBuilder`. It runs the existing spider, saves timestamped artifacts under
+`outputs/nike/runs/`, updates `outputs/nike/latest/`, and writes a
+Spidermon-style health report to `reports/nike/latest-health.json`.
+
+If the health report fails, `Monitor` should create a QA issue. `QAReviewer`
+decides whether the failure is data quality, credentials/access, parser drift,
+or a structural rebuild that should go back to `ScrapyBuilder`.
+
+To inspect the latest scraped products:
+
+```sh
+./scripts/show-latest-items.py
 ```
 
 ## Implemented Scraper

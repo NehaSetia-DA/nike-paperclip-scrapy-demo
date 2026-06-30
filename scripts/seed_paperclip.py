@@ -37,6 +37,53 @@ def find_by_name(items, name):
     return None
 
 
+def update_agent(agent_id, agent, workspace):
+    payload = {
+        "role": agent["role"],
+        "title": agent["title"],
+        "capabilities": agent["capabilities"],
+        "adapterConfig": {
+            "cwd": workspace,
+            "env": {},
+            "timeoutSec": 0,
+            "dangerouslySkipPermissions": False
+        },
+        "instructionsBundle": {
+            "files": {
+                "AGENTS.md": agent_instructions(agent)
+            }
+        }
+    }
+    return request("PATCH", f"/api/agents/{agent_id}", payload)
+
+
+def update_issue(issue_id, issue, agent_ids, project_id, goal_id):
+    payload = {
+        "title": issue["title"],
+        "description": issue["description"],
+        "priority": issue["priority"],
+        "assigneeAgentId": agent_ids[issue["assignee"]],
+        "projectId": project_id,
+        "goalId": goal_id
+    }
+    return request("PATCH", f"/api/issues/{issue_id}", payload)
+
+
+def update_routine(routine_id, routine, agent_ids, project_id, goal_id):
+    payload = {
+        "title": routine["title"],
+        "description": routine["description"],
+        "assigneeAgentId": agent_ids[routine["assignee"]],
+        "projectId": project_id,
+        "goalId": goal_id,
+        "priority": "medium",
+        "status": "active",
+        "concurrencyPolicy": "coalesce_if_active",
+        "catchUpPolicy": "skip_missed"
+    }
+    return request("PATCH", f"/api/routines/{routine_id}", payload)
+
+
 def agent_instructions(agent):
     return f"""# {agent["title"]}
 
@@ -50,10 +97,19 @@ Mission:
 
 Coordinate a local Paperclip + Claude + Zyte Web Data + Scrapy demo for public Nike product/catalog extraction.
 
+Operating model:
+
+- Build mode is for a new website, a schema change, or structural site drift. It may use `prompts/zyte-skill-pipeline.md` and Zyte Claude skills.
+- Run mode is for normal Nike crawls after the spider exists. It must use `./scripts/monitor-nike-crawl.sh`.
+- ScrapyBuilder must not run during normal crawl/monitor cycles.
+- Monitor runs the existing spider, writes outputs under `outputs/nike/`, and writes health reports under `reports/nike/`.
+- QAReviewer reads the health report and decides whether the failure is data quality, local parser drift, access/compliance, or a structural rebuild.
+- Coordinator only routes escalation to ScrapyBuilder when QA or Monitor identifies rebuild-worthy drift.
+
 Rules:
 
 - The Paperclip server process must be started with `ANTHROPIC_API_KEY` and `ZYTE_API_KEY` in its environment.
-- Use Zyte Claude skills for scraper generation. Do not handwrite selectors from scratch.
+- Use Zyte Claude skills for scraper generation in build mode. Do not handwrite selectors from scratch for new-site generation.
 - Respect the safety boundary in `README.md`.
 - Do not bypass login walls, checkout flows, account pages, private pages, or restricted content.
 - If robots, terms, credentials, or access constraints block the intended crawl, stop and report the blocker instead of working around it.
@@ -119,8 +175,9 @@ def main():
     for agent in plan["agents"]:
         existing_agent = find_by_name(existing_agents, agent["name"])
         if existing_agent:
+            update_agent(existing_agent["id"], agent, workspace)
             agent_ids[agent["name"]] = existing_agent["id"]
-            print(f"Using existing agent: {agent['name']} ({existing_agent['id']})")
+            print(f"Updated existing agent: {agent['name']} ({existing_agent['id']})")
             continue
         payload = {
             "name": agent["name"],
@@ -148,7 +205,14 @@ def main():
         agent_ids[agent["name"]] = created["id"]
         print(f"Created agent: {agent['name']} ({created['id']})")
 
+    existing_issues_response = request("GET", f"/api/companies/{company_id}/issues")
+    existing_issues = existing_issues_response if isinstance(existing_issues_response, list) else existing_issues_response.get("issues", [])
     for issue in plan["issues"]:
+        existing_issue = find_by_name(existing_issues, issue["title"])
+        if existing_issue:
+            updated = update_issue(existing_issue["id"], issue, agent_ids, project["id"], goal["id"])
+            print(f"Updated issue: {updated['title']} ({updated['id']})")
+            continue
         payload = {
             "title": issue["title"],
             "description": issue["description"],
@@ -162,27 +226,34 @@ def main():
         print(f"Created issue: {created['title']} ({created['id']})")
 
     routine = plan["routine"]
-    routine_payload = {
-        "title": routine["title"],
-        "description": routine["description"],
-        "assigneeAgentId": agent_ids[routine["assignee"]],
-        "projectId": project["id"],
-        "goalId": goal["id"],
-        "priority": "medium",
-        "status": "active",
-        "concurrencyPolicy": "coalesce_if_active",
-        "catchUpPolicy": "skip_missed"
-    }
-    created_routine = request("POST", f"/api/companies/{company_id}/routines", routine_payload)
-    print(f"Created routine: {created_routine['title']} ({created_routine['id']})")
+    existing_routines_response = request("GET", f"/api/companies/{company_id}/routines")
+    existing_routines = existing_routines_response if isinstance(existing_routines_response, list) else existing_routines_response.get("routines", [])
+    existing_routine = find_by_name(existing_routines, routine["title"])
+    if existing_routine:
+        created_routine = update_routine(existing_routine["id"], routine, agent_ids, project["id"], goal["id"])
+        print(f"Updated routine: {created_routine['title']} ({created_routine['id']})")
+    else:
+        routine_payload = {
+            "title": routine["title"],
+            "description": routine["description"],
+            "assigneeAgentId": agent_ids[routine["assignee"]],
+            "projectId": project["id"],
+            "goalId": goal["id"],
+            "priority": "medium",
+            "status": "active",
+            "concurrencyPolicy": "coalesce_if_active",
+            "catchUpPolicy": "skip_missed"
+        }
+        created_routine = request("POST", f"/api/companies/{company_id}/routines", routine_payload)
+        print(f"Created routine: {created_routine['title']} ({created_routine['id']})")
 
-    trigger_payload = {
-        "kind": "schedule",
-        "cronExpression": routine["cronExpression"],
-        "timezone": routine["timezone"]
-    }
-    request("POST", f"/api/routines/{created_routine['id']}/triggers", trigger_payload)
-    print("Added daily schedule trigger.")
+        trigger_payload = {
+            "kind": "schedule",
+            "cronExpression": routine["cronExpression"],
+            "timezone": routine["timezone"]
+        }
+        request("POST", f"/api/routines/{created_routine['id']}/triggers", trigger_payload)
+        print("Added daily schedule trigger.")
 
     state = {
         "companyId": company_id,

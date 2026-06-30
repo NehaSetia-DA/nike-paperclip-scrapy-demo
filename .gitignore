@@ -8,3 +8,5 @@ __pycache__/
 outputs/paperclip-seed-state.json
 outputs/nike-products-sample.jsonl
 outputs/robots-response.txt
+outputs/nike/
+reports/nike/latest-health.json
