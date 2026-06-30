@@ -43,6 +43,7 @@ def build_report(items_path: Path, log_path: Path, min_items: int) -> dict:
         "minimum_items": len(items) >= min_items,
         "required_fields_complete": all(count == 0 for count in missing.values()),
         "no_duplicate_product_urls": duplicate_urls == 0,
+        "spidermon_evidence": "[Spidermon]" in log_text,
         "zyte_api_evidence": "scrapy-zyte-api" in log_text,
         "no_fatal_zyte_errors": "'scrapy-zyte-api/fatal_errors': 0" in log_text or '"scrapy-zyte-api/fatal_errors": 0' in log_text,
     }
@@ -62,6 +63,8 @@ def build_report(items_path: Path, log_path: Path, min_items: int) -> dict:
         probable_cause = "required field completeness dropped: likely schema or parser drift"
     if duplicate_urls:
         probable_cause = "duplicate product URLs: navigation or canonical URL handling needs QA review"
+    if not checks["spidermon_evidence"]:
+        probable_cause = "crawl log does not show the real Spidermon extension running"
     if not checks["zyte_api_evidence"]:
         probable_cause = "crawl log does not show Zyte API usage"
 
@@ -76,6 +79,10 @@ def build_report(items_path: Path, log_path: Path, min_items: int) -> dict:
         "required_missing_counts": missing,
         "duplicate_product_url_count": duplicate_urls,
         "currency_counts": dict(currencies),
+        "spidermon": {
+            "evidence_in_log": checks["spidermon_evidence"],
+            "monitor_log_lines": count_log(r"\[Spidermon\]", log_text),
+        },
         "zyte_api": {
             "evidence_in_log": checks["zyte_api_evidence"],
             "processed_mentions": count_log(r"scrapy-zyte-api/processed", log_text),

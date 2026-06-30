@@ -64,7 +64,7 @@ export ZYTE_API_KEY="..."
 Run mode does not call the Zyte codegen skills and does not involve
 `ScrapyBuilder`. It runs the existing spider, saves timestamped artifacts under
 `outputs/nike/runs/`, updates `outputs/nike/latest/`, and writes a
-Spidermon-style health report to `reports/nike/latest-health.json`.
+Spidermon-backed health report to `reports/nike/latest-health.json`.
 
 If the health report fails, `Monitor` should create a QA issue. `QAReviewer`
 decides whether the failure is data quality, credentials/access, parser drift,
@@ -75,6 +75,28 @@ To inspect the latest scraped products:
 ```sh
 ./scripts/show-latest-items.py
 ```
+
+## Spidermon Demo
+
+The Scrapy project enables the real Spidermon Scrapy extension in
+`nike_catalog/nike_catalog/settings.py`. On spider close, Spidermon checks:
+
+- minimum product count
+- required field completeness
+- duplicate `product_url` values
+- Zyte API processed requests
+- fatal Zyte API errors
+
+To deliberately break extraction and show the monitor catching it:
+
+```sh
+export ZYTE_API_KEY="..."
+./scripts/demo-spidermon-break.sh
+```
+
+The demo clears `brand` after extraction, keeps the items flowing, and should
+fail with a Spidermon required-field error. Artifacts are saved under
+`outputs/nike/runs/demo-spidermon-break-*`.
 
 ## Implemented Scraper
 

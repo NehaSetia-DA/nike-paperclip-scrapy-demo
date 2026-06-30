@@ -34,6 +34,10 @@ class NikeSpider(scrapy.Spider):
     def parse(self, response):
         item = parse_product_html(response.text, response.url)
         if item.get("name") and item.get("price") is not None:
+            demo_break_field = self.crawler.settings.get("NIKE_DEMO_BREAK_FIELD")
+            if demo_break_field:
+                item[demo_break_field] = None
+                self.logger.warning("Demo break enabled: cleared %s for %s", demo_break_field, response.url)
             yield item
         else:
             self.logger.warning("Skipping page with incomplete required fields: %s", response.url)

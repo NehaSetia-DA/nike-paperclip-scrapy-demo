@@ -25,7 +25,7 @@
       "role": "qa",
       "title": "QA Reviewer",
       "reportsTo": "Coordinator",
-      "capabilities": "Reviews crawl outputs and health reports, diagnoses field completeness, duplicate URLs, parser drift, and decides whether repair can be local or needs ScrapyBuilder.",
+      "capabilities": "Reviews crawl outputs, Spidermon failures, and health reports; diagnoses field completeness, duplicate URLs, parser drift, and decides whether repair can be local or needs ScrapyBuilder.",
       "adapterType": "claude_local"
     },
     {
@@ -33,7 +33,7 @@
       "role": "general",
       "title": "Catalog Health Monitor",
       "reportsTo": "Coordinator",
-      "capabilities": "Runs existing spiders through scripts/monitor-nike-crawl.sh, records health reports, and opens QA repair issues when quality drops.",
+      "capabilities": "Runs existing spiders through scripts/monitor-nike-crawl.sh, confirms real Spidermon close-monitor results, records health reports, and opens QA repair issues when quality drops.",
       "adapterType": "claude_local"
     }
   ],
@@ -52,14 +52,14 @@
     },
     {
       "title": "Validate generated fixtures and sample crawl",
-      "description": "QA mode. Run ./scripts/validate-scrapy-output.sh, inspect outputs/nike/latest/products.jsonl and reports/nike/latest-health.json, then decide pass, QA repair, or ScrapyBuilder rebuild.",
+      "description": "QA mode. Run ./scripts/validate-scrapy-output.sh, inspect Spidermon output, outputs/nike/latest/products.jsonl, and reports/nike/latest-health.json, then decide pass, QA repair, or ScrapyBuilder rebuild.",
       "priority": "medium",
       "assignee": "QAReviewer"
     }
   ],
   "routine": {
     "title": "Daily Nike Catalog Health Check",
-    "description": "Run ./scripts/monitor-nike-crawl.sh against the existing Nike spider. Do not call ScrapyBuilder unless the health report points to structural parser/site drift.",
+    "description": "Run ./scripts/monitor-nike-crawl.sh against the existing Nike spider, including the real Spidermon close-monitor suite. Do not call ScrapyBuilder unless the health report points to structural parser/site drift.",
     "assignee": "Monitor",
     "cronExpression": "0 9 * * *",
     "timezone": "Asia/Makassar"

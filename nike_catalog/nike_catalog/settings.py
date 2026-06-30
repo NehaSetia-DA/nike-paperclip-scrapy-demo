@@ -19,6 +19,19 @@ ADDONS = {
     "scrapy_zyte_api.Addon": 500,
 }
 
+ITEM_PIPELINES = {
+    "nike_catalog.pipelines.NikeStatsPipeline": 300,
+}
+
+SPIDERMON_ENABLED = True
+EXTENSIONS = {
+    "spidermon.contrib.scrapy.extensions.Spidermon": 500,
+}
+SPIDERMON_SPIDER_CLOSE_MONITORS = (
+    "nike_catalog.monitors.NikeSpiderCloseMonitorSuite",
+)
+NIKE_MIN_ITEMS = 10
+
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 
 FEED_EXPORT_ENCODING = "utf-8"
