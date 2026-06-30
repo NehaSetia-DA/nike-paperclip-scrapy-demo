@@ -53,7 +53,11 @@ def analyze(spider_file: Path, settings_file: Path | None, log_file: Path | None
     constants = collect_constants(tree)
     findings: list[Finding] = []
 
-    uses_browser_html = "browserHtml" in spider_text
+    has_browser_html_fallback = "browserHtml" in spider_text
+    uses_browser_html_by_default = has_browser_html_fallback and not re.search(
+        r"getbool\([\"']NIKE_USE_BROWSER[\"']\s*,\s*False\)",
+        spider_text,
+    )
     uses_automap = "zyte_api_automap" in spider_text
     dont_filter_count = spider_text.count("dont_filter=True")
     retry_times_match = re.search(r"RETRY_TIMES\s*=\s*(\d+)", settings_text)
@@ -67,12 +71,19 @@ def analyze(spider_file: Path, settings_file: Path | None, log_file: Path | None
     retry_count = stat_from_log(log_text, "retry/count")
     dupefilter = stat_from_log(log_text, "dupefilter/filtered")
 
-    if uses_browser_html:
+    if uses_browser_html_by_default:
         findings.append(Finding(
             "high",
             "Rendered browser HTML is enabled for every request",
             "Spider passes zyte_api_automap with browserHtml=True.",
             "Keep browser rendering only if static HTML or embedded JSON is insufficient. For Nike, first test whether ProductGroup/Product JSON-LD is available without browserHtml and switch PDP requests to cheaper HTTP extraction when possible.",
+        ))
+    elif has_browser_html_fallback:
+        findings.append(Finding(
+            "info",
+            "Browser rendering is available as an explicit fallback",
+            "Spider supports NIKE_USE_BROWSER=True but defaults to httpResponseBody/httpResponseHeaders.",
+            "Keep the fallback for recovery, but leave it disabled for routine runs while static JSON-LD extraction remains healthy.",
         ))
 
     if uses_automap:
@@ -149,7 +160,8 @@ def analyze(spider_file: Path, settings_file: Path | None, log_file: Path | None
         "log": str(log_file) if log_file else None,
         "sample_url": sample_url,
         "signals": {
-            "uses_browser_html": uses_browser_html,
+            "uses_browser_html": uses_browser_html_by_default,
+            "has_browser_html_fallback": has_browser_html_fallback,
             "uses_zyte_api_automap": uses_automap,
             "dont_filter_true_count": dont_filter_count,
             "retry_times": retry_times,

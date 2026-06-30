@@ -23,12 +23,21 @@ class NikeSpider(scrapy.Spider):
     ]
 
     def start_requests(self):
+        use_browser = self.crawler.settings.getbool("NIKE_USE_BROWSER", False)
+        zyte_api_automap = (
+            {"browserHtml": True}
+            if use_browser
+            else {"httpResponseBody": True, "httpResponseHeaders": True}
+        )
+        seen = set()
         for url in self.start_urls:
+            if url in seen:
+                continue
+            seen.add(url)
             yield scrapy.Request(
                 url,
                 callback=self.parse,
-                meta={"zyte_api_automap": {"browserHtml": True}},
-                dont_filter=True,
+                meta={"zyte_api_automap": zyte_api_automap},
             )
 
     def parse(self, response):

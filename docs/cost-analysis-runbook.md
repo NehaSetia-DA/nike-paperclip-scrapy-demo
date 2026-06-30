@@ -39,12 +39,18 @@ It writes:
 
 ## Current Nike Cost Hypothesis
 
-The Nike spider currently requests every PDP through Zyte API with
-`browserHtml=True`. That is intentionally reliable for the demo, but likely the
-highest-impact cost lever is to test whether the JSON-LD product data is present
-without browser rendering. If it is, PDP requests can move to a cheaper access
-mode while preserving the same parser and Spidermon checks.
+The Nike spider now defaults to Zyte API `httpResponseBody` and
+`httpResponseHeaders`, which keeps the JSON-LD extraction path working without
+browser rendering in routine runs.
 
-`dont_filter=True` is also present on seeded PDP requests. It is acceptable for a
-small fixed demo seed, but a production crawl should deduplicate seed URLs and
-avoid bypassing Scrapy's request filter unless there is a specific reason.
+Browser rendering is still available as an explicit recovery fallback:
+
+```sh
+NIKE_USE_BROWSER=true ./scripts/monitor-nike-crawl.sh
+```
+
+Use that fallback only when static JSON-LD extraction fails and QA confirms the
+extra Zyte API cost is justified.
+
+The spider also deduplicates seed URLs before scheduling requests and no longer
+bypasses Scrapy's duplicate request filter with `dont_filter=True`.
