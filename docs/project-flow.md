@@ -9,62 +9,122 @@ Editable dark-mode Excalidraw version:
 `docs/project-flow-dark.excalidraw`
 
 ```mermaid
-flowchart TD
-    A["Paperclip company: Nike Product Intelligence"] --> B["Goal: generate and monitor Nike product catalog extraction"]
-    B --> C["Workspace: nike-paperclip-scrapy-demo / nike_catalog"]
-    C --> D["Local environment: ANTHROPIC_API_KEY + ZYTE_API_KEY"]
-    D --> E["Coordinator"]
+%%{init: {
+  "theme": "base",
+  "flowchart": {
+    "htmlLabels": true,
+    "curve": "basis",
+    "nodeSpacing": 58,
+    "rankSpacing": 78
+  },
+  "themeVariables": {
+    "fontFamily": "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
+    "fontSize": "20px",
+    "primaryTextColor": "#f8fafc",
+    "lineColor": "#94a3b8",
+    "background": "#0b1020",
+    "mainBkg": "#0f172a",
+    "clusterBkg": "#111827",
+    "clusterBorder": "#475569",
+    "edgeLabelBackground": "#0b1020"
+  }
+}}%%
+flowchart LR
+    subgraph CP["<b>Company + Control Plane</b>"]
+        A["<b>Nike Product Intelligence</b><br/>Paperclip company"]
+        B["<b>Goal</b><br/>Generate and monitor Nike product catalog extraction"]
+        C["<b>Workspace</b><br/>nike-paperclip-scrapy-demo<br/>nike_catalog"]
+        D["<b>Local Environment</b><br/>ANTHROPIC_API_KEY<br/>ZYTE_API_KEY"]
+    end
 
-    E --> F["ScrapyBuilder"]
-    E --> G["QAReviewer"]
-    E --> H["Monitor"]
-    E --> I["CostAnalyst"]
+    subgraph AG["<b>Five Agents</b>"]
+        E["<b>Coordinator</b><br/>Routes build, run, QA, cost<br/>Owns approvals and escalation"]
+        F["<b>ScrapyBuilder</b><br/>Builds or rebuilds spider<br/>Runs Zyte Claude skills"]
+        G["<b>QAReviewer</b><br/>Validates output quality<br/>Diagnoses drift vs local fix"]
+        H["<b>Monitor</b><br/>Runs existing spider<br/>Owns health checks"]
+        I["<b>CostAnalyst</b><br/>Reviews Zyte API spend<br/>Finds high-impact reductions"]
+    end
 
-    F --> J["Build mode: use Zyte Claude skill flow"]
-    J --> J1["/scrape-zyte-login"]
-    J1 --> J2["/scrape-define"]
-    J2 --> J3["/scrape-review-schema"]
-    J3 --> K{"Schema approved?"}
-    K -->|"No"| J2
-    K -->|"Yes"| J4["/scrape-spec"]
-    J4 --> J5["/scrape-ensure-project"]
-    J5 --> J6["/scrape-codegen"]
-    J6 --> J7["/scrape-create-spider"]
-    J7 --> L["Generated Scrapy project: nike_catalog"]
+    subgraph BUILD["<b>Build Mode: First Site Or Rebuild</b>"]
+        J["<b>Zyte Claude Skill Flow</b><br/>/scrape-zyte-login<br/>/scrape-define<br/>/scrape-review-schema"]
+        K{"<b>Schema Approved?</b>"}
+        J4["<b>Generate Spec + Project</b><br/>/scrape-spec<br/>/scrape-ensure-project"]
+        J6["<b>Codegen + Spider</b><br/>/scrape-codegen<br/>/scrape-create-spider"]
+        L["<b>Generated Scrapy Project</b><br/>nike_catalog"]
+        M["<b>Extraction Strategy</b><br/>Nike JSON-LD<br/>ProductGroup / Product"]
+        N["<b>Access Layer</b><br/>scrapy-zyte-api<br/>browserHtml for reliability"]
+        O["<b>Fixtures + Sample Crawl</b>"]
+    end
 
-    L --> M["Extraction strategy: Nike JSON-LD ProductGroup/Product"]
-    M --> N["Zyte API access through scrapy-zyte-api"]
-    N --> O["Fixtures and sample crawl"]
-    O --> G
+    subgraph RUN["<b>Run Mode: Daily Existing Spider Loop</b>"]
+        T["<b>Run Mode Begins</b><br/>No ScrapyBuilder in normal runs"]
+        U["<b>Monitor Command</b><br/>scripts/monitor-nike-crawl.sh"]
+        V["<b>Scrapy Output</b><br/>products.jsonl<br/>crawl.log"]
+        W["<b>Spidermon Close Monitors</b><br/>minimum items<br/>required fields<br/>duplicate URLs<br/>Zyte API processed<br/>no fatal Zyte errors"]
+        X["<b>Paperclip Health Report</b><br/>health.json"]
+        Y{"<b>Healthy Run?</b>"}
+        Z["<b>Record Healthy Latest Run</b>"]
+    end
 
-    G --> P{"Healthy sample?"}
-    P -->|"No"| Q["QA repair issue"]
-    Q --> R{"Structural site/parser drift?"}
-    R -->|"Yes"| E
-    R -->|"No"| S["Local parser/settings repair"]
-    S --> G
-    P -->|"Yes"| T["Run mode begins"]
+    subgraph QA["<b>QA + Repair Loop</b>"]
+        P{"<b>Healthy Sample?</b>"}
+        Q["<b>QA Repair Issue</b>"]
+        R{"<b>Structural Drift?</b>"}
+        S["<b>Local Parser / Settings Repair</b>"]
+    end
 
-    H --> U["scripts/monitor-nike-crawl.sh"]
-    T --> U
-    U --> V["Scrapy writes products.jsonl + crawl.log"]
-    V --> W["Spidermon close monitors"]
-    W --> W1["minimum items"]
-    W --> W2["required fields"]
-    W --> W3["duplicate product URLs"]
-    W --> W4["Zyte API processed requests"]
-    W --> W5["no fatal Zyte errors"]
-    W --> X["health.json"]
-    X --> Y{"Healthy run?"}
-    Y -->|"Yes"| Z["Monitor records healthy latest run"]
-    Y -->|"No"| Q
+    subgraph COST["<b>Cost Optimization Loop</b>"]
+        AA["<b>Cost Review</b><br/>/scrapy-cost-analysis<br/>or local analyzer"]
+        AB["<b>Signals Reviewed</b><br/>browserHtml, automap, retries,<br/>duplicates, request/item ratio"]
+        AC{"<b>Highest-impact Change?</b>"}
+        AD["<b>Keep Reliability-first Settings</b>"]
+        AE["<b>Test Cheaper Path</b><br/>non-browser JSON-LD<br/>or reduce duplicates/retries"]
+    end
 
-    I --> AA["/scrapy-cost-analysis or local analyzer"]
-    AA --> AB["Review browserHtml, automap, retries, duplicates, request/item ratio"]
-    AB --> AC{"Highest-impact cost change?"}
-    AC -->|"None"| AD["Keep reliability-first settings"]
-    AC -->|"Yes"| AE["Test cheaper non-browser JSON-LD path or reduce duplicates/retries"]
-    AE --> G
+    A --> B --> C --> D --> E
+    E --> F
+    E --> G
+    E --> H
+    E --> I
+
+    F --> J --> K
+    K -->|"revise"| J
+    K -->|"approved"| J4 --> J6 --> L --> M --> N --> O --> G
+
+    G --> P
+    P -->|"yes"| T
+    P -->|"no"| Q --> R
+    R -->|"yes: rebuild"| E
+    R -->|"no: local fix"| S --> G
+
+    H --> U
+    T --> U --> V --> W --> X --> Y
+    Y -->|"yes"| Z
+    Y -->|"no"| Q
+
+    I --> AA --> AB --> AC
+    AC -->|"none"| AD
+    AC -->|"yes"| AE --> G
+
+    classDef company fill:#1e3a8a,stroke:#60a5fa,color:#f8fafc,stroke-width:2px,font-size:20px;
+    classDef coordinator fill:#4c1d95,stroke:#c4b5fd,color:#faf5ff,stroke-width:3px,font-size:22px;
+    classDef agent fill:#111827,stroke:#a78bfa,color:#f8fafc,stroke-width:2px,font-size:20px;
+    classDef build fill:#064e3b,stroke:#34d399,color:#ecfdf5,stroke-width:2px,font-size:20px;
+    classDef run fill:#0f766e,stroke:#5eead4,color:#f0fdfa,stroke-width:2px,font-size:20px;
+    classDef qa fill:#581c87,stroke:#d8b4fe,color:#faf5ff,stroke-width:2px,font-size:20px;
+    classDef cost fill:#7c2d12,stroke:#fb923c,color:#fff7ed,stroke-width:2px,font-size:20px;
+    classDef decision fill:#713f12,stroke:#facc15,color:#fefce8,stroke-width:3px,font-size:21px;
+    classDef success fill:#14532d,stroke:#86efac,color:#f0fdf4,stroke-width:2px,font-size:20px;
+
+    class A,B,C,D company;
+    class E coordinator;
+    class F,G,H,I agent;
+    class J,J4,J6,L,M,N,O build;
+    class T,U,V,W,X run;
+    class P,Q,R,S qa;
+    class AA,AB,AD,AE cost;
+    class K,Y,AC decision;
+    class Z success;
 ```
 
 ## Why Paperclip
