@@ -42,6 +42,8 @@ export ZYTE_API_KEY="..."
 
 Full architecture and decision flow: `docs/project-flow.md`.
 
+Component architecture: `docs/architecture.md`.
+
 ## Expected Generated Layout
 
 ```text
