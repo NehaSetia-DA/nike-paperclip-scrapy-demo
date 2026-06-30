@@ -35,6 +35,14 @@
       "reportsTo": "Coordinator",
       "capabilities": "Runs existing spiders through scripts/monitor-nike-crawl.sh, confirms real Spidermon close-monitor results, records health reports, and opens QA repair issues when quality drops.",
       "adapterType": "claude_local"
+    },
+    {
+      "name": "CostAnalyst",
+      "role": "cfo",
+      "title": "Scrapy Cost Analyst",
+      "reportsTo": "Coordinator",
+      "capabilities": "Runs /scrapy-cost-analysis when available or scripts/run-scrapy-cost-analysis.sh locally; reviews browser rendering, Zyte API automation, retries, duplicate crawling, pagination scope, and job stats before deployment or when spend rises.",
+      "adapterType": "claude_local"
     }
   ],
   "issues": [
@@ -55,6 +63,12 @@
       "description": "QA mode. Run ./scripts/validate-scrapy-output.sh, inspect Spidermon output, outputs/nike/latest/products.jsonl, and reports/nike/latest-health.json, then decide pass, QA repair, or ScrapyBuilder rebuild.",
       "priority": "medium",
       "assignee": "QAReviewer"
+    },
+    {
+      "title": "Review Nike spider Zyte API cost profile",
+      "description": "Cost mode. Prefer /scrapy-cost-analysis if the Zyte Claude Code skill is installed; otherwise run ./scripts/run-scrapy-cost-analysis.sh. Confirm browserHtml usage, retry amplification, duplicate crawling, request/item ratio, and highest-impact cost reductions before deployment.",
+      "priority": "medium",
+      "assignee": "CostAnalyst"
     }
   ],
   "routine": {

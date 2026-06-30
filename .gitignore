@@ -10,3 +10,5 @@ outputs/nike-products-sample.jsonl
 outputs/robots-response.txt
 outputs/nike/
 reports/nike/latest-health.json
+reports/nike/latest-cost-analysis.json
+reports/nike/latest-cost-analysis.md

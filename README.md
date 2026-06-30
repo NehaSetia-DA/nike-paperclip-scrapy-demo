@@ -28,6 +28,7 @@ For the already generated local scraper, this is the useful validation loop:
 ```sh
 export ZYTE_API_KEY="..."
 ./scripts/monitor-nike-crawl.sh
+./scripts/run-scrapy-cost-analysis.sh
 ```
 
 ## Demo Architecture
@@ -36,6 +37,10 @@ export ZYTE_API_KEY="..."
 - Zyte Claude skills are the modular build pipeline: schema discovery, review, spec, project creation, page-object generation, spider wiring.
 - Scrapy is the extraction engine.
 - Zyte API is the access/rendering layer.
+- Spidermon is the runtime quality guardrail.
+- Scrapy cost analysis is the optimization lane for browser rendering, retries, duplicate requests, and Zyte API usage.
+
+Full architecture and decision flow: `docs/project-flow.md`.
 
 ## Expected Generated Layout
 
@@ -76,6 +81,14 @@ To inspect the latest scraped products:
 ./scripts/show-latest-items.py
 ```
 
+To inspect Zyte API cost risks for the current spider:
+
+```sh
+./scripts/run-scrapy-cost-analysis.sh
+```
+
+The report is written to `reports/nike/latest-cost-analysis.md`.
+
 ## Spidermon Demo
 
 The Scrapy project enables the real Spidermon Scrapy extension in
@@ -109,6 +122,21 @@ subtitle, price text, size labels, and style/color labels.
 The parser intentionally avoids brittle CSS selectors for the core product
 fields; JSON-LD is the stable extraction surface found by the Zyte skill
 analysis pass.
+
+## Cost Analysis
+
+The intended Claude Code skill invocation is documented in
+`docs/cost-analysis-runbook.md`:
+
+```text
+/scrapy-cost-analysis nike nike_catalog/nike_catalog/spiders/nike.py nike_catalog/nike_catalog/settings.py outputs/nike/latest/crawl.log https://www.nike.com/id/t/academy-erling-haaland-football-ERATCGJV
+```
+
+If the Claude Code skill is not installed yet, use the local fallback:
+
+```sh
+./scripts/run-scrapy-cost-analysis.sh
+```
 
 ## Safety Boundary
 
