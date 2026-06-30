@@ -1,8 +1,10 @@
 # Nike Product Intelligence Architecture
 
 This is the component architecture for the local Nike scraping demo. The agent
-flow is documented separately in `docs/project-flow.md`; this diagram focuses on
-system boundaries, runtime components, secrets, artifacts, and data movement.
+flow is documented separately in [`docs/project-flow.md`](project-flow.md), and
+the feedback-loop view is documented in
+[`docs/system-thinking-loop.md`](system-thinking-loop.md). This diagram focuses
+on system boundaries, runtime components, secrets, artifacts, and data movement.
 
 ```mermaid
 %%{init: {
@@ -27,9 +29,9 @@ system boundaries, runtime components, secrets, artifacts, and data movement.
 }}%%
 flowchart LR
     subgraph USER["<b>User + Local Machine</b>"]
-        Browser["<b>Browser</b><br/>Paperclip UI<br/>http://127.0.0.1:3100/NIK"]
-        CLI["<b>Terminal / Scripts</b><br/>preflight, seed, crawl,<br/>monitor, cost analysis"]
-        Env["<b>Local Environment</b><br/>.env + Paperclip Local env<br/>ANTHROPIC_API_KEY<br/>ZYTE_API_KEY"]
+        Browser["<b>Browser</b><br/>Paperclip UI<br/>http://127.0.0.1:3100"]
+        CLI["<b>Terminal / Scripts</b><br/>preflight, setup-paperclip, seed,<br/>run-zyte-skill-pipeline, monitor,<br/>validate, cost analysis"]
+        Env["<b>Local Environment</b><br/>.env + Paperclip local env<br/>ANTHROPIC_API_KEY<br/>ZYTE_API_KEY"]
     end
 
     subgraph CONTROL["<b>Paperclip Control Plane</b>"]
@@ -41,12 +43,12 @@ flowchart LR
     subgraph BUILD["<b>Build-Time Generation</b>"]
         Claude["<b>Claude Code</b><br/>local agent runtime"]
         ZyteSkills["<b>Zyte Claude Skills</b><br/>schema discovery, review,<br/>spec, codegen, spider wiring"]
-        Generated["<b>Generated Scrapy Project</b><br/>nike_catalog"]
+        Generated["<b>Generated Scrapy Project</b><br/>nike_catalog/"]
     end
 
     subgraph SCRAPY["<b>Scrapy Extraction Engine</b>"]
         Spider["<b>Nike Spider</b><br/>public /id/t/... PDP seeds"]
-        Parser["<b>Parser</b><br/>JSON-LD ProductGroup / Product<br/>visible-page fallbacks"]
+        Parser["<b>Parser</b><br/>nike_catalog/parsers.py<br/>JSON-LD ProductGroup / Product<br/>visible-page fallbacks"]
         Pipeline["<b>Stats Pipeline</b><br/>required fields + duplicate URL stats"]
         Settings["<b>Settings</b><br/>scrapy-zyte-api addon<br/>Spidermon enabled"]
     end
@@ -58,18 +60,20 @@ flowchart LR
 
     subgraph QUALITY["<b>Quality + Monitoring</b>"]
         Spidermon["<b>Spidermon</b><br/>minimum items<br/>required fields<br/>duplicates<br/>Zyte API processed<br/>fatal errors"]
+        HealthScript["<b>Health Report Script</b><br/>scripts/monitor_nike_crawl.py"]
         Health["<b>Health Report</b><br/>outputs/nike/latest/health.json<br/>reports/nike/latest-health.json"]
         QA["<b>QA Decision</b><br/>local repair vs structural rebuild"]
     end
 
     subgraph OUTPUTS["<b>Artifacts + Reports</b>"]
-        Products["<b>Products</b><br/>outputs/nike/latest/products.jsonl"]
-        Logs["<b>Logs</b><br/>outputs/nike/latest/crawl.log"]
+        Products["<b>Products</b><br/>outputs/nike/runs/&lt;run_id&gt;/products.jsonl<br/>outputs/nike/latest/products.jsonl"]
+        Logs["<b>Logs</b><br/>outputs/nike/runs/&lt;run_id&gt;/crawl.log<br/>outputs/nike/latest/crawl.log"]
         Cost["<b>Cost Report</b><br/>reports/nike/latest-cost-analysis.md"]
         Diagrams["<b>Docs / Diagrams</b><br/>project-flow.md<br/>project-flow-dark.excalidraw<br/>architecture.md"]
     end
 
     Browser --> Company
+    Browser --> Diagrams
     CLI --> Env
     Env --> Claude
     Env --> ZyteAPI
@@ -91,7 +95,7 @@ flowchart LR
     Pipeline --> Spidermon
     Spider --> Logs
     Logs --> Spidermon
-    Spidermon --> Health --> QA
+    Spidermon --> HealthScript --> Health --> QA
     QA -->|"healthy"| Issues
     QA -->|"local fix"| Generated
     QA -->|"structural drift"| Agents
@@ -103,22 +107,21 @@ flowchart LR
     Health --> Issues
     Products --> Issues
     Logs --> Issues
-    Diagrams --> Issues
 
-    classDef local fill:#1e3a8a,stroke:#60a5fa,color:#f8fafc,stroke-width:2px,font-size:19px;
-    classDef control fill:#4c1d95,stroke:#c4b5fd,color:#faf5ff,stroke-width:2px,font-size:19px;
-    classDef build fill:#064e3b,stroke:#34d399,color:#ecfdf5,stroke-width:2px,font-size:19px;
-    classDef scrapy fill:#075985,stroke:#38bdf8,color:#f0f9ff,stroke-width:2px,font-size:19px;
-    classDef external fill:#713f12,stroke:#facc15,color:#fefce8,stroke-width:2px,font-size:19px;
-    classDef quality fill:#581c87,stroke:#d8b4fe,color:#faf5ff,stroke-width:2px,font-size:19px;
-    classDef artifact fill:#14532d,stroke:#86efac,color:#f0fdf4,stroke-width:2px,font-size:19px;
+    classDef local fill:#1e3a8a,stroke:#60a5fa,color:#f8fafc,stroke-width:2px;
+    classDef control fill:#4c1d95,stroke:#c4b5fd,color:#faf5ff,stroke-width:2px;
+    classDef build fill:#064e3b,stroke:#34d399,color:#ecfdf5,stroke-width:2px;
+    classDef scrapy fill:#075985,stroke:#38bdf8,color:#f0f9ff,stroke-width:2px;
+    classDef external fill:#713f12,stroke:#facc15,color:#fefce8,stroke-width:2px;
+    classDef quality fill:#581c87,stroke:#d8b4fe,color:#faf5ff,stroke-width:2px;
+    classDef artifact fill:#14532d,stroke:#86efac,color:#f0fdf4,stroke-width:2px;
 
     class Browser,CLI,Env local;
     class Company,Agents,Issues control;
     class Claude,ZyteSkills,Generated build;
     class Spider,Parser,Pipeline,Settings scrapy;
     class ZyteAPI,Nike external;
-    class Spidermon,Health,QA quality;
+    class Spidermon,HealthScript,Health,QA quality;
     class Products,Logs,Cost,Diagrams artifact;
 ```
 
@@ -132,8 +135,9 @@ flowchart LR
   spider instead of regenerating code.
 - **Zyte API** is the access/rendering layer. It supplies rendered access and
   emits usage/error stats consumed by monitoring and cost review.
-- **Spidermon + health reports** are runtime guardrails. They decide whether a
-  run is healthy enough or should create QA repair work.
+- **Spidermon + health reports** are runtime guardrails. `scripts/monitor_nike_crawl.py`
+  turns crawl artifacts into a Paperclip-friendly health report that decides
+  whether a run is healthy enough or should create QA repair work.
 - **Cost analysis** reviews the current spider and job evidence for high-impact
   savings such as avoiding browser rendering when JSON-LD is available without
   it.
@@ -141,10 +145,27 @@ flowchart LR
 ## Primary Runtime Paths
 
 1. **Build path**: Paperclip `ScrapyBuilder` -> Claude Code -> Zyte skills ->
-   generated `nike_catalog` project.
+   generated `nike_catalog/` project -> `scripts/validate-scrapy-output.sh`.
 2. **Run path**: Paperclip `Monitor` -> `scripts/monitor-nike-crawl.sh` ->
-   Scrapy spider -> Zyte API -> Nike public PDPs -> `products.jsonl`.
-3. **Quality path**: Scrapy stats/logs -> Spidermon -> `health.json` ->
-   QAReviewer -> local repair or rebuild escalation.
+   `scripts/run-nike-crawl.sh` -> Scrapy spider -> Zyte API -> Nike public PDPs ->
+   `outputs/nike/latest/products.jsonl`.
+3. **Quality path**: Scrapy stats/logs -> Spidermon -> `monitor_nike_crawl.py` ->
+   `health.json` -> QAReviewer -> local repair or rebuild escalation.
 4. **Cost path**: crawl log + spider/settings -> cost analyzer or
    `/scrapy-cost-analysis` -> CostAnalyst recommendations -> QA validation.
+
+## Artifact Layout
+
+```text
+outputs/nike/
+  runs/<run_id>/products.jsonl
+  runs/<run_id>/crawl.log
+  runs/<run_id>/health.json
+  latest/products.jsonl
+  latest/crawl.log
+  latest/health.json
+reports/nike/
+  latest-health.json
+  latest-cost-analysis.md
+outputs/nike-products-sample.jsonl   # build-mode sample only
+```

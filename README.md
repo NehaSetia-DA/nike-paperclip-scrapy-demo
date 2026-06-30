@@ -44,6 +44,8 @@ Full architecture and decision flow: `docs/project-flow.md`.
 
 Component architecture: `docs/architecture.md`.
 
+Systems-thinking loop: `docs/system-thinking-loop.md`.
+
 ## Expected Generated Layout
 
 ```text
